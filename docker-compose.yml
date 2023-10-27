@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+    app:
+        build:
+            context: ./docker/php-fpm
+            dockerfile: Dockerfile
+        container_name: php_app
+        volumes:
+            - .:/app
+        ports:
+            - "9000:9000"
+    nginx:
+        image: nginx:stable
+        container_name: nginx_app
+        ports:
+            - "80:80"
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - .:/app
+        depends_on:
+            - app
+    pgsql:
+        image: postgres:latest
+        container_name: db_app
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_DB: ${DB_DATABASE}
+
+volumes:
+    postgres-data:
