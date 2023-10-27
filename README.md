@@ -9,6 +9,10 @@ make setup-docker
 ```sh
 make docker-migrate
 ```
+4. Запустите сиды
+```sh
+make start-seeds
+```
 
 ## Пути
 
