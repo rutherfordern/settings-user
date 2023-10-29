@@ -19,7 +19,9 @@ make start-seeds
 ### /api/v1/auth/login
 Получить токен для авторизации в последующих запросах.
 
-email - admin@admin.ru, password - admin.
+Request body:
+email - admin@admin.ru
+password - admin
 
 ### /api/v1/profile/edit/nickname
 Отправить код для подтверждения изменения nickname. По умолчанию код отправляет на email.
@@ -27,8 +29,12 @@ email - admin@admin.ru, password - admin.
 ### /api/v1/profile/verify-change-nickname
 Подтвердить код и отправить новый ник.
 
-verification_code - .
-nickname - .
+Request body:
+verification_code
+nickname
 
 ### /api/v1/profile/edit/verification-method
 Изменить способ подтверждения изменений.
+
+Request body:
+verification_method
