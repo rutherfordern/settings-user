@@ -20,7 +20,7 @@ make start-seeds
 Получить токен для авторизации в последующих запросах.
 
 Request body:
-email - admin@admin.ru
+email - admin@admin.ru,
 password - admin
 
 ### /api/v1/profile/edit/nickname
@@ -30,7 +30,7 @@ password - admin
 Подтвердить код и отправить новый ник.
 
 Request body:
-verification_code
+verification_code,
 nickname
 
 ### /api/v1/profile/edit/verification-method
