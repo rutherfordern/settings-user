@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\DTO\User\Update\UpdateNicknameDto;
 use App\DTO\User\Update\UpdateVerificationMethodDto;
+use App\Models\ValueObject\VerificationMethod;
 use App\Repository\UserRepository;
 
 class UserService
@@ -26,8 +27,9 @@ class UserService
     public function updateVerificationMethod(UpdateVerificationMethodDto $dto): void
     {
         $user = $this->userRepository->getById($dto->user_id);
+        $verificationMethod = new VerificationMethod($dto->verificationMethod);
 
-        $user->verification_method = $dto->verification_method;
+        $user->verification_method = $verificationMethod->getVerificationMethod();
 
         $user->save();
     }

@@ -16,15 +16,14 @@ class ChangeVerificationMethodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'verification_method' => 'required|in:email,sms,telegram',
+            'verification_method' => 'required',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'verification_method.required' => 'Поле "Метод верификации" обязательно для заполнения.',
-            'verification_method.in' => 'Поле "Метод верификации" должно быть одним из следующих значений: email, sms, telegram.',
+            'verification_method.required' => 'Поле verification_method обязательно для заполнения.',
         ];
     }
 }

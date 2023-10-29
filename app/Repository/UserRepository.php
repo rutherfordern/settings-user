@@ -8,8 +8,8 @@ use App\Models\User;
 
 class UserRepository
 {
-    public function getById(int $id): ?User
+    public function getById(int $userId): ?User
     {
-        return User::where('id', $id)->first();
+        return User::where('id', $userId)->first();
     }
 }

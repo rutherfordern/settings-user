@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web\Api;
 
 use App\DTO\User\Update\UpdateNicknameDto;
 use App\DTO\User\Update\UpdateVerificationMethodDto;
@@ -13,25 +13,31 @@ use App\Http\Requests\ChangeVerificationMethodRequest;
 use App\Http\Requests\VerifyChangeNicknameRequest;
 use App\Service\UserService;
 use App\Service\UserVerificationService;
+use App\Verification\VerificationCodeGenerator\VerificationCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        private UserVerificationService $userVerificationService,
+        private UserService $userService,
+    ) {
+    }
+
     public function me(): JsonResponse
     {
         return response()->json(auth()->user());
     }
 
     public function changeNickname(
-        UserVerificationService $userVerificationService,
-        VerificationSenderFactory $senderFactory
+        VerificationSenderFactory $senderFactory,
+        VerificationCodeGenerator $codeGenerator
     ): JsonResponse {
         $user = auth()->user();
 
         $verificationMethod = $user->verification_method;
-        $verificationCode = Str::random(6);
+        $verificationCode = $codeGenerator->generate();
 
         $verificationDto = new CreateUserVerificationDto(
             $user->id,
@@ -40,31 +46,29 @@ class ProfileController extends Controller
             false
         );
 
-        $userVerificationService->create($verificationDto);
+        $this->userVerificationService->create($verificationDto);
 
-        $senderFactory::createSender($verificationMethod);
+        $sender = $senderFactory->createSender($verificationMethod);
+        $sender->send($user, $verificationCode);
 
         return response()->json(['message' => 'Код подтверждения отправлен']);
     }
 
-    public function verifyChangeNickname(
-        VerifyChangeNicknameRequest $request,
-        UserService $userService,
-        UserVerificationService $userVerificationService
-    ): JsonResponse {
+    public function verifyChangeNickname(VerifyChangeNicknameRequest $request): JsonResponse
+    {
         $userId = auth()->user()->id;
         $providedCode = $request->validated(['verification_code']);
 
-        $verification = $userVerificationService->findUnverifiedCode($userId, $providedCode);
+        $verification = $this->userVerificationService->findUnverifiedCode($userId, $providedCode);
 
         if ($verification) {
             $newNickname = $request->validated(['nickname']);
 
             $updateNicknameDto = new UpdateNicknameDto($userId, $newNickname);
-            $userService->updateNickname($updateNicknameDto);
+            $this->userService->updateNickname($updateNicknameDto);
 
             $updateVerificationStatusDto = new UpdateVerificationStatusDto($verification->id, true);
-            $userVerificationService->updateVerificationStatus($updateVerificationStatusDto);
+            $this->userVerificationService->updateVerificationStatus($updateVerificationStatusDto);
 
             return response()->json(['message' => 'Nickname успешно изменен']);
         } else {
@@ -72,14 +76,14 @@ class ProfileController extends Controller
         }
     }
 
-    public function changeVerificationMethod(ChangeVerificationMethodRequest $request, UserService $userService): JsonResponse
+    public function changeVerificationMethod(ChangeVerificationMethodRequest $request): JsonResponse
     {
         $userId = auth()->user()->id;
         $verificationMethod = $request->validated(['verification_method']);
 
         $dto = new UpdateVerificationMethodDto($userId, $verificationMethod);
 
-        $userService->updateVerificationMethod($dto);
+        $this->userService->updateVerificationMethod($dto);
 
         return response()->json(['message' => 'Метод верификации успешно обновлен']);
     }

@@ -24,9 +24,9 @@ class VerifyChangeNicknameRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nickname.required' => 'Поле "Nickname" обязательно для заполнения.',
-            'nickname.max' => 'Поле "Nickname" не должно превышать :max символов.',
-            'verification_code.required' => 'Поле "Verification Method" обязательно для заполнения.',
+            'nickname.required' => 'Поле nickname обязательно для заполнения.',
+            'nickname.max' => 'Поле nickname не должно превышать :max символов.',
+            'verification_code.required' => 'Поле verification_method обязательно для заполнения.',
         ];
     }
 }

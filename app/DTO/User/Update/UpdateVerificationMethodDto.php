@@ -8,7 +8,7 @@ class UpdateVerificationMethodDto
 {
     public function __construct(
         public readonly int $user_id,
-        public readonly string $verification_method,
+        public readonly string $verificationMethod,
     ) {
     }
 }
